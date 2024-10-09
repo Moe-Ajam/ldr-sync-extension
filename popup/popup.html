@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LDR Sync</title>
+    <link rel="stylesheet" href="bulma.min.css" />
+  </head>
+
+  <body>
+    <div class="container is-fluid m-3">
+      <h1 class="title">LDR Sync</h1>
+      <div class="field">
+        <label class="label">Status</label>
+        <span class="tag is-success">Linked</span>
+        <span class="tag is-warning">Connecting</span>
+        <span class="tag is-danger">Stopped</span>
+      </div>
+    </div>
+
+    <div class="container is-fluid m-3">
+      <div class="field">
+        <label class="label">Personal Key</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            value="YAHS-SACH-LSJE-SIDU"
+            readonly
+          />
+        </div>
+      </div>
+    </div>
+    <div class="container is-fluid m-3">
+      <div class="field">
+        <label class="label">SO Key</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            value=""
+            placeholder="Add your Bfs key to link!"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="container is-fluid m-3">
+      <button class="button is-success is-fullwidth">Link</button>
+    </div>
+  </body>
+</html>
