@@ -1,3 +1,7 @@
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log("onInstalled reason:", details.reason);
+});
+
 chrome.runtime.onMessage.addListener((data) => {
   switch (data.event) {
     case "onStop":
