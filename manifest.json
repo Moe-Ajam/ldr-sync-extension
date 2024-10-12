@@ -16,5 +16,11 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["storage"]
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"], // Match any URL
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["storage", "activeTab"]
 }
