@@ -1,4 +1,4 @@
-API_URL = "127.0.0.1:8080/api";
+API_URL = "http://127.0.0.1:8080";
 document.addEventListener("DOMContentLoaded", () => {
   const signInScreen = document.getElementById("signInScreen");
   const signUpScreen = document.getElementById("signUpScreen");
@@ -34,15 +34,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("signUpPassword").value;
       const username = document.getElementById("signUpUsername").value;
 
-      const response = await fetch("http://127.0.0.1:8080/api/register", {
+      const response = await fetch(API_URL + "/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username, password }),
       });
       if (response.ok) {
-        showMainContent();
+        showSignIn();
       } else {
         alert("Sign up failed");
+      }
+    });
+
+  // Form submission for Sign In
+  document
+    .getElementById("signInScreen")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signInEmail").value;
+      const password = document.getElementById("signInPassword").value;
+
+      const response = await fetch(API_URL + "/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (response.ok) {
+        showMainContent();
+      } else {
+        alert("Sign in failed");
       }
     });
 });
