@@ -67,49 +67,55 @@
 
     <!-- Main Content (Visible Only to Logged-In Users) -->
     <div id="mainContent" style="display: none">
-      <div class="container is-fluid m-3">
-        <h1 class="title">LDR Sync</h1>
-        <div class="field">
-          <label class="label">Status</label>
-          <span class="tag is-success">Linked</span>
-          <span class="tag is-warning">Connecting</span>
-          <span class="tag is-danger">Stopped</span>
-        </div>
-      </div>
+      <div class="container is-fluid m-4">
+        <!-- Title Section -->
+        <h1 class="title has-text-centered">LDR Sync</h1>
 
-      <div class="container is-fluid m-3">
-        <div class="field">
+        <!-- Status Section -->
+        <div class="field mb-4">
+          <label class="label">Status</label>
+          <div class="tags are-medium">
+            <span class="tag is-success">Linked</span>
+            <span class="tag is-warning">Connecting</span>
+            <span class="tag is-danger">Stopped</span>
+          </div>
+        </div>
+
+        <!-- Personal Key Section -->
+        <div class="field mb-4">
           <label class="label">Personal Key</label>
           <div class="control">
             <input
-              class="input"
+              class="input is-primary"
               type="text"
               value="YAHS-SACH-LSJE-SIDU"
               id="personalKey"
               readonly
             />
           </div>
+          <p class="help">Share this key with your friend</p>
         </div>
-      </div>
 
-      <div class="container is-fluid m-3">
-        <div class="field">
-          <label class="label">SO Key</label>
+        <!-- SO Key Section -->
+        <div class="field mb-4">
+          <label class="label">Partner's Key</label>
           <div class="control">
             <input
               class="input"
               type="text"
-              value=""
-              placeholder="Add your Bfs key to link!"
+              placeholder="Enter your partner's key"
               id="friendKey"
             />
           </div>
+          <p class="help">Link with your partner by entering their key here</p>
         </div>
-      </div>
-      <div class="container is-fluid m-3">
-        <button class="button is-success is-fullwidth" id="linkButton">
-          Link
-        </button>
+
+        <!-- Link Button -->
+        <div class="field">
+          <button class="button is-success is-fullwidth" id="linkButton">
+            Link
+          </button>
+        </div>
       </div>
     </div>
   </body>
