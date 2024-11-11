@@ -1,10 +1,25 @@
 API_URL = "http://127.0.0.1:8080";
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const signInScreen = document.getElementById("signInScreen");
   const signUpScreen = document.getElementById("signUpScreen");
   const mainContent = document.getElementById("mainContent");
 
-  showSignIn();
+  const token = localStorage.getItem("auth_token");
+
+  if (token) {
+    console.log("Token exists");
+    const isValid = await validateToken(token);
+    if (isValid) {
+      console.log("Token is valid");
+      showMainContent();
+    } else {
+      console.log("Token is invalid");
+      showSignIn();
+    }
+  } else {
+    console.log("Token doesn't exist");
+    showSignIn();
+  }
 
   function showSignIn() {
     signInScreen.style.display = "block";
@@ -20,6 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
     signInScreen.style.display = "none";
     signUpScreen.style.display = "none";
     mainContent.style.display = "block";
+  }
+
+  async function validateToken(token) {
+    try {
+      const response = await fetch(API_URL + "/api/validate-token", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.ok;
+    } catch (error) {
+      console.error("Token validation error:", error);
+      return false;
+    }
   }
 
   document.getElementById("showSignUp").addEventListener("click", showSignUp);
@@ -58,8 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
       if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("auth_token", data.token);
         showMainContent();
       } else {
         alert("Sign in failed");
