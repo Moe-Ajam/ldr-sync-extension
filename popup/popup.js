@@ -98,6 +98,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Sign in failed");
       }
     });
+
+  // Logout
+  document.getElementById("logoutButton").addEventListener("click", () => {
+    localStorage.removeItem("auth_token");
+
+    showSignIn();
+  });
 });
 // Elements
 const personalKeyElement = document.getElementById("personalKey");
