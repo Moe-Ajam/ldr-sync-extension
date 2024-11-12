@@ -67,20 +67,15 @@
 
     <!-- Main Content (Visible Only to Logged-In Users) -->
     <div id="mainContent" style="display: none">
+      <nav class="breadcrumb is-right" aria-label="breadcrumbs">
+        <ul>
+          <li><a href="#">How to use</a></li>
+          <li>
+            <a href="#" class="has-text-danger" id="logoutButton">Logout</a>
+          </li>
+        </ul>
+      </nav>
       <div class="container is-fluid m-4">
-        <!-- Title Section -->
-        <h1 class="title has-text-centered">LDR Sync</h1>
-
-        <!-- Status Section -->
-        <div class="field mb-4">
-          <label class="label">Status</label>
-          <div class="tags are-medium">
-            <span class="tag is-success">Linked</span>
-            <span class="tag is-warning">Connecting</span>
-            <span class="tag is-danger">Stopped</span>
-          </div>
-        </div>
-
         <!-- Personal Key Section -->
         <div class="field mb-4">
           <label class="label">Personal Key</label>
@@ -89,25 +84,10 @@
               class="input is-primary"
               type="text"
               value="YAHS-SACH-LSJE-SIDU"
-              id="personalKey"
-              readonly
+              id="linkKey"
             />
           </div>
           <p class="help">Share this key with your friend</p>
-        </div>
-
-        <!-- SO Key Section -->
-        <div class="field mb-4">
-          <label class="label">Partner's Key</label>
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              placeholder="Enter your partner's key"
-              id="friendKey"
-            />
-          </div>
-          <p class="help">Link with your partner by entering their key here</p>
         </div>
 
         <!-- Link Button -->
