@@ -1,8 +1,29 @@
+// TODO: make the code more readable and seperate it into files
 API_URL = "http://127.0.0.1:8080";
+
+let isConnected = false;
+
+// helper function
+function updateButton() {
+  if (isConnected) {
+    connectButton.textContent = "Disconnect";
+    connectButton.classList.remove("is-success");
+    connectButton.classList.add("is-danger");
+  } else {
+    connectButton.textContent = "Connect";
+    connectButton.classList.remove("is-danger");
+    connectButton.classList.add("is-success");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // Elements
   const signInScreen = document.getElementById("signInScreen");
   const signUpScreen = document.getElementById("signUpScreen");
   const mainContent = document.getElementById("mainContent");
+
+  const connectButton = document.getElementById("connectButton");
+  const linkKey = document.getElementById("linkKey");
 
   const token = localStorage.getItem("auth_token");
 
@@ -93,6 +114,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("auth_token", data.token);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("email", data.email);
         showMainContent();
       } else {
         alert("Sign in failed");
@@ -105,22 +128,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     showSignIn();
   });
+
+  // Connecting
+  connectButton.onclick = async () => {
+    console.log("Connect button clicked!");
+    // Requesting a new key from the server
+    if (linkKey.value.trim() === "") {
+      const response = await fetch(API_URL + "/api/create-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        linkKey.value = data.session_id;
+        isConnected = true;
+        updateButton();
+      } else {
+        alert("Something went wrong");
+      }
+    }
+  };
 });
+
 // Elements
 const personalKeyElement = document.getElementById("personalKey");
 const friendKeyElement = document.getElementById("friendKey");
 
 // Button elements
 const linkButtonElement = document.getElementById("linkButton");
-
-linkButtonElement.onclick = () => {
-  const prefs = {
-    friendKey: friendKeyElement.value,
-    personalKey: personalKeyElement.value,
-  };
-  chrome.runtime.sendMessage({ event: "onStart", prefs });
-  friendKeyElement.value = "TEST-VALUE";
-};
 
 chrome.storage.local.get(["friendKey", "personalKey"], (result) => {
   const { friendKey, personalKey } = result;
