@@ -4,7 +4,7 @@ const signUpScreen = document.getElementById("signUpScreen");
 const mainContent = document.getElementById("mainContent");
 
 const connectButton = document.getElementById("connectButton");
-const linkKey = document.getElementById("linkKey");
+const linkKeyTextBox = document.getElementById("linkKey");
 
 const personalKeyElement = document.getElementById("personalKey");
 const friendKeyElement = document.getElementById("friendKey");
@@ -15,7 +15,7 @@ const showSignUpButton = document.getElementById("showSignUp");
 const linkButtonElement = document.getElementById("linkButton");
 
 const ButtonState = {
-  GET_SESSION: "GET_SESSION",
+  REQUEST_SESSION: "REQUEST_SESSION",
   CONNECT: "CONNECT",
   DISCONNECT: "DISCONNECT",
 };
@@ -41,29 +41,33 @@ function showMainContent() {
 
 function updateButton(currentButtonState) {
   switch (currentButtonState) {
-    case ButtonState.GET_SESSION:
-      connectButton.textContent = "New Session";
+    case ButtonState.REQUEST_SESSION:
+      connectButton.textContent = "Request Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.add("is-warning");
+      connectButton.classList.add("is-link");
+      connectButton.classList.add("is-outlined");
       break;
     case ButtonState.CONNECT:
       connectButton.textContent = "Connect";
       connectButton.classList.add("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.remove("is-warning");
+      connectButton.classList.remove("is-link");
+      connectButton.classList.remove("is-outlined");
       break;
     case ButtonState.DISCONNECT:
       connectButton.textContent = "Disconnect";
       connectButton.classList.remove("is-success");
       connectButton.classList.add("is-danger");
-      connectButton.classList.remove("is-warning");
+      connectButton.classList.remove("is-link");
+      connectButton.classList.remove("is-link is-outlined");
       break;
     default:
       connectButton.textContent = "New Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.add("is-warning");
+      connectButton.classList.add("is-link is-outlined");
+      connectButton.classList.add("is-outlined");
       break;
   }
 }

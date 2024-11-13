@@ -2,7 +2,7 @@ let isConnected = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("auth_token");
-  let currentButtonState = ButtonState.GET_SESSION;
+  let currentButtonState = ButtonState.REQUEST_SESSION;
   updateButton(currentButtonState);
 
   if (token) {
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("Connect button clicked!");
     const token = localStorage.getItem("auth_token");
     // Requesting a new key from the server
-    if (linkKey.value.trim() === "") {
+    if (linkKeyTextBox.value.trim() === "") {
       const response = await fetch(API_URL + "/create-session", {
         method: "POST",
         headers: {
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       if (response.ok) {
         const data = await response.json();
-        linkKey.value = data.session_id;
+        linkKeyTextBox.value = data.session_id;
         currentButtonState = ButtonState.CONNECT;
         updateButton(currentButtonState);
       } else {
