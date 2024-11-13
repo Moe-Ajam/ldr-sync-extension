@@ -2,6 +2,8 @@ let isConnected = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("auth_token");
+  let currentButtonState = ButtonState.GET_SESSION;
+  updateButton(currentButtonState);
 
   if (token) {
     console.log("Token exists");
@@ -34,18 +36,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (response.ok) {
         const data = await response.json();
         linkKey.value = data.session_id;
-        isConnected = true;
-        updateButton();
+        currentButtonState = ButtonState.CONNECT;
+        updateButton(currentButtonState);
       } else {
         alert("Something went wrong");
       }
     }
   };
-});
-
-chrome.storage.local.get(["friendKey", "personalKey"], (result) => {
-  const { friendKey, personalKey } = result;
-  console.log("from the local storage");
-  console.log("personal key from the storage:", personalKey);
-  console.log("friend key from the storage:", friendKey);
 });
