@@ -1,6 +1,18 @@
 //TODO: use the new logic with the connection button
 const API_URL = "http://127.0.0.1:8080/api";
-const WS_URL = "ws://127.0.0.1:8080/api";
+
+async function disconnectSession() {
+  chrome.runtime.sendMessage(
+    {
+      type: "disconnect_websocket",
+    },
+    (response) => {
+      if (response.status === "disconnected") {
+        console.log("WebSocket disconnected successfully");
+      }
+    },
+  );
+}
 
 async function createSession() {
   const token = localStorage.getItem("auth_token");
@@ -18,8 +30,17 @@ async function createSession() {
       const sessionID = data.session_id;
       linkKeyTextBox.value = sessionID;
 
-      connectWebSocket(sessionID);
-      console.log("Connection established!");
+      chrome.runtime.sendMessage(
+        {
+          type: "connect_websocket",
+          sessionID: sessionID,
+        },
+        (response) => {
+          if (response.status === "connected") {
+            console.log("WebSocket connected through background.js");
+          }
+        },
+      );
     } else {
       alert("Failed to create a session.");
     }
@@ -55,26 +76,4 @@ async function joinSession() {
   } catch (error) {
     console.error("Error creating session:", error);
   }
-}
-
-function connectWebSocket(sessionID) {
-  const wsURL = `ws:${WS_URL}/ws?session_id={sessionID}`;
-  const socket = new WebSocket(wsURL);
-  console.log("Establishing connection...");
-  console.log(`ws:${WS_URL}/ws?session_id={sessionID}`);
-
-  socket.onopen = () => {
-    console.log("WebSocket connection established for session:", sessionID);
-    updateButton(ButtonState.DISCONNECT);
-  };
-
-  socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    console.log("Recieved message:", message);
-  };
-
-  socket.onclose = () => {
-    console.log("WebSocket connection closed for session:", sessionID);
-    updateButton(ButtonState.REQUEST_SESSION);
-  };
 }

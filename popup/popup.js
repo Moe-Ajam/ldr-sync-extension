@@ -52,7 +52,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     //     alert("Something went wrong");
     //   }
     // }
-    console.log("Requesting connection...");
-    await createSession();
+    if (connectButton.textContent === "Request Session") {
+      console.log("Requesting connection...");
+      await createSession();
+      updateButton(ButtonState.DISCONNECT);
+    } else if (connectButton.textContent === "Disconnect") {
+      console.log("Requesting connection...");
+      await disconnectSession();
+      updateButton(ButtonState.CONNECT);
+      linkKeyTextBox.value = "";
+    }
   };
 });

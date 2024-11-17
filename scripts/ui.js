@@ -60,13 +60,14 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-success");
       connectButton.classList.add("is-danger");
       connectButton.classList.remove("is-link");
-      connectButton.classList.remove("is-link is-outlined");
+      connectButton.classList.remove("is-link");
+      connectButton.classList.remove("is-outlined");
       break;
     default:
       connectButton.textContent = "New Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.add("is-link is-outlined");
+      connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
       break;
   }
