@@ -1,25 +1,7 @@
-console.log("content script loaded");
-
-let lastRun = 0;
-function throttleHandleVideo() {
-  const now = Date.now();
-  if (now - lastRun >= 300) {
-    handleVideo();
-    lastRun = now;
-  }
-}
-function handleVideo() {
-  const video = document.querySelector("video");
-
-  if (video) {
-    console.log("Current time", video.currentTime);
-  }
-}
-
-const observer = new MutationObserver((mutation) => {
-  throttleHandleVideo();
+var port = chrome.runtime.connect({ name: "knockknock" });
+port.postMessage({ joke: "Knock knock" });
+port.onMessage.addListener(function (msg) {
+  if (msg.question == "Who's there?") port.postMessage({ answer: "Madame" });
+  else if (msg.question == "Madame who?")
+    port.postMessage({ answer: "Madame... Bovary" });
 });
-
-observer.observe(document.body, { childList: true, subtree: true });
-
-handleVideo();

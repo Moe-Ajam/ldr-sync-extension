@@ -19,6 +19,7 @@ async function createSession() {
       linkKeyTextBox.value = sessionID;
 
       connectWebSocket(sessionID);
+      console.log("Connection established!");
     } else {
       alert("Failed to create a session.");
     }
@@ -59,6 +60,8 @@ async function joinSession() {
 function connectWebSocket(sessionID) {
   const wsURL = `ws:${WS_URL}/ws?session_id={sessionID}`;
   const socket = new WebSocket(wsURL);
+  console.log("Establishing connection...");
+  console.log(`ws:${WS_URL}/ws?session_id={sessionID}`);
 
   socket.onopen = () => {
     console.log("WebSocket connection established for session:", sessionID);

@@ -1,6 +1,17 @@
 let isConnected = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  chrome.runtime.onConnect.addListener(function (port) {
+    console.assert(port.name === "knockknock");
+    post.onMessage.addListener(function (msg) {
+      if (msg.joke === "Knock knock")
+        port.postMessage({ question: "Who's there?" });
+      else if (msg.answer === "Madame")
+        port.postMessage({ question: "Madame who?" });
+      else if (msg.answer === "Madame... Bovary")
+        port.postMessage({ question: "I don't get it." });
+    });
+  });
   const token = localStorage.getItem("auth_token");
   let currentButtonState = ButtonState.REQUEST_SESSION;
   updateButton(currentButtonState);
@@ -22,25 +33,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Connecting
   connectButton.onclick = async () => {
-    console.log("Connect button clicked!");
-    const token = localStorage.getItem("auth_token");
-    // Requesting a new key from the server
-    if (linkKeyTextBox.value.trim() === "") {
-      const response = await fetch(API_URL + "/create-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        linkKeyTextBox.value = data.session_id;
-        currentButtonState = ButtonState.CONNECT;
-        updateButton(currentButtonState);
-      } else {
-        alert("Something went wrong");
-      }
-    }
+    // const token = localStorage.getItem("auth_token");
+    //// Requesting a new key from the server
+    // if (linkKeyTextBox.value.trim() === "") {
+    //   const response = await fetch(API_URL + "/create-session", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   });
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     linkKeyTextBox.value = data.session_id;
+    //     currentButtonState = ButtonState.CONNECT;
+    //     updateButton(currentButtonState);
+    //   } else {
+    //     alert("Something went wrong");
+    //   }
+    // }
+    console.log("Requesting connection...");
+    await createSession();
   };
 });
