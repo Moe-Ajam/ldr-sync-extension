@@ -4,25 +4,31 @@ let socket = null;
 let sessionID = null;
 
 function connectWebSocket(newSessionID) {
-  sessionID = newSessionID;
-  const wsURL = `ws:${WS_URL}/ws?session_id={sessionID}`;
-  socket = new WebSocket(wsURL);
-  console.log("Establishing connection...");
+  chrome.storage.local.get(["auth_token"], (result) => {
+    const token = result.auth_token;
 
-  socket.onopen = () => {
-    console.log("WebSocket connection established for session:", sessionID);
-    updateButton(ButtonState.DISCONNECT);
-  };
+    if (!token) {
+      console.error("Authorization token missing");
+      return;
+    }
+    sessionID = newSessionID;
+    const wsURL = `${WS_URL}/ws?session_id=${sessionID}&token=${token}`;
+    socket = new WebSocket(wsURL);
+    console.log("Establishing connection...");
 
-  socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    console.log("Recieved message:", message);
-  };
+    socket.onopen = () => {
+      console.log("WebSocket connection established for session:", sessionID);
+    };
 
-  socket.onclose = () => {
-    console.log("WebSocket connection closed for session:", sessionID);
-    updateButton(ButtonState.REQUEST_SESSION);
-  };
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log("Recieved message:", message);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed for session:", sessionID);
+    };
+  });
 }
 
 function disconnectWebSocket() {
@@ -35,6 +41,7 @@ function disconnectWebSocket() {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "connect_websocket") {
+    console.log("message recieved:", message);
     connectWebSocket(message.sessionID);
     sendResponse({ status: "connected" });
   } else if (message.type === "disonnect_websocket") {
