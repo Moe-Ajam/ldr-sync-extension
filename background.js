@@ -40,7 +40,20 @@ function disconnectWebSocket() {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "connect_websocket") {
+  // TODO: Change the username to be dynamic
+  if (
+    message.action === "update_time" &&
+    socket &&
+    socket.readyState === WebSocket.OPEN
+  ) {
+    const playbackMessage = {
+      action: "update_time",
+      current_time: message.current_time,
+      user_id: "test",
+    };
+    console.log(playbackMessage);
+    socket.send(JSON.stringify(playbackMessage));
+  } else if (message.type === "connect_websocket") {
     console.log("message recieved:", message);
     connectWebSocket(message.sessionID);
     sendResponse({ status: "connected" });
