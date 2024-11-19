@@ -34,7 +34,10 @@ document
     if (response.ok) {
       const data = await response.json();
       // localStorage.setItem("auth_token", data.token);
-      chrome.storage.local.set({ auth_token: data.token });
+      chrome.storage.local.set({
+        auth_token: data.token,
+        username: data.username,
+      });
       // localStorage.setItem("username", data.username);
       // localStorage.setItem("email", data.email);
       showMainContent();
