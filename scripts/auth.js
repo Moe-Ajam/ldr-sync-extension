@@ -36,10 +36,8 @@ document
       // localStorage.setItem("auth_token", data.token);
       chrome.storage.local.set({
         auth_token: data.token,
-        username: data.username,
+        username: data.name,
       });
-      // localStorage.setItem("username", data.username);
-      // localStorage.setItem("email", data.email);
       showMainContent();
     } else {
       alert("Sign in failed");
@@ -48,7 +46,8 @@ document
 
 // Logout
 document.getElementById("logoutButton").addEventListener("click", () => {
-  localStorage.removeItem("auth_token");
+  // localStorage.removeItem("auth_token");
+  chrome.storage.local.remove("auth_token");
 
   showSignIn();
 });
