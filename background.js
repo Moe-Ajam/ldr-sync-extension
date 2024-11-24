@@ -23,6 +23,15 @@ function connectWebSocket(newSessionID) {
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       console.log("Recieved message:", message);
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          const activeTabId = tabs[0].id;
+          chrome.tabs.sendMessage(activeTabId, {
+            action: message.action,
+            time: message.current_time,
+          });
+        }
+      });
     };
 
     socket.onclose = () => {
@@ -47,13 +56,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       socket &&
       socket.readyState === WebSocket.OPEN
     ) {
-      const playbackMessage = {
-        action: "update_time",
-        current_time: message.current_time,
-        user_id: result.username,
-      };
-      console.log(playbackMessage);
-      socket.send(JSON.stringify(playbackMessage));
+      sendMessage("update_time", message.current_time, result.username);
+    } else if (
+      message.action === "pause" &&
+      socket &&
+      socket.readyState === WebSocket.OPEN
+    ) {
+      sendMessage("pause", message.current_time, result.username);
     } else if (message.type === "connect_websocket") {
       console.log("message recieved:", message);
       connectWebSocket(message.sessionID);
@@ -66,3 +75,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   });
 });
+
+function sendMessage(action, current_time, username) {
+  const playbackMessage = {
+    action: action,
+    current_time: current_time,
+    user_id: username,
+  };
+  console.log(playbackMessage);
+  socket.send(JSON.stringify(playbackMessage));
+}

@@ -32,6 +32,22 @@ async function startMonitoringPlayback() {
   const video = await waitForVideoElement();
   console.log("Video element found:", video);
 
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Message recived in content.js:", message);
+
+    if (message.action === "pause") {
+      video.pause();
+    }
+  });
+
+  video.addEventListener("pause", () => {
+    console.log("Video is paused @ time:", video.currentTime);
+    chrome.runtime.sendMessage({
+      action: "pause",
+      current_time: video.currentTime,
+    });
+  });
+
   setInterval(() => {
     const currentTime = video.currentTime;
     console.log("Current playback time:", currentTime);
