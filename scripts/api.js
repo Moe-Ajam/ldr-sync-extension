@@ -9,6 +9,10 @@ async function disconnectSession() {
     (response) => {
       if (response.status === "disconnected") {
         console.log("WebSocket disconnected successfully");
+        chrome.storage.local.set({
+          connection_status: "initial",
+          session_id: "",
+        });
       }
     },
   );
@@ -44,6 +48,11 @@ async function createSession() {
           (response) => {
             if (response.status === "connected") {
               console.log("WebSocket connected through background.js");
+
+              chrome.storage.local.set({
+                connection_status: "connected",
+                session_id: sessionID,
+              });
             }
           },
         );

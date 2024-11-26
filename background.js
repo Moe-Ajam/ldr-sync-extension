@@ -3,6 +3,11 @@ const WS_URL = "ws://127.0.0.1:8080/api";
 let socket = null;
 let sessionID = null;
 
+chrome.storage.local.set({
+  connection_status: "initial",
+  session_id: "",
+});
+
 function connectWebSocket(newSessionID) {
   chrome.storage.local.get(["auth_token"], (result) => {
     const token = result.auth_token;
@@ -49,7 +54,6 @@ function disconnectWebSocket() {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // TODO: Change the username to be dynamic
   chrome.storage.local.get(["username"], (result) => {
     if (
       message.action === "update_time" &&
@@ -74,6 +78,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ status: "error", error: "WebSocket not connected" });
     }
   });
+
+  return true;
 });
 
 function sendMessage(action, current_time, username) {
