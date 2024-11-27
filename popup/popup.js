@@ -34,18 +34,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateButton(ButtonState.REQUEST_SESSION);
         linkKeyTextBox.value = "";
       }
+      linkKeyTextBox.addEventListener("input", handleInputChange);
+
+      function handleInputChange(event) {
+        const inputText = event.target.value;
+        if (
+          inputText.length === 36 &&
+          connectButton.textContent === "Request Session"
+        ) {
+          console.log("should be join session now");
+          updateButton(ButtonState.JOIN_SESSION);
+        } else {
+          console.log("useless trigger");
+          updateButton(ButtonState.REQUEST_SESSION);
+        }
+      }
+
+      // Connecting button logic
+      connectButton.onclick = async () => {
+        if (connectButton.textContent === "Request Session") {
+          await createSession();
+          updateButton(ButtonState.DISCONNECT);
+        } else if (connectButton.textContent === "Disconnect") {
+          await disconnectSession();
+          updateButton(ButtonState.REQUEST_SESSION);
+          linkKeyTextBox.value = "";
+        } else if (connectButton.textContent === "Join Session") {
+          await joinSession();
+          updateButton(ButtonState.DISCONNECT);
+        }
+      };
     },
   );
-
-  // Connecting button logic
-  connectButton.onclick = async () => {
-    if (connectButton.textContent === "Request Session") {
-      await createSession();
-      updateButton(ButtonState.DISCONNECT);
-    } else if (connectButton.textContent === "Disconnect") {
-      await disconnectSession();
-      updateButton(ButtonState.REQUEST_SESSION);
-      linkKeyTextBox.value = "";
-    }
-  };
 });

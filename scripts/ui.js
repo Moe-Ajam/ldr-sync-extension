@@ -16,6 +16,7 @@ const linkButtonElement = document.getElementById("linkButton");
 
 const ButtonState = {
   REQUEST_SESSION: "REQUEST_SESSION",
+  JOIN_SESSION: "JOIN_SESSION",
   CONNECT: "CONNECT",
   DISCONNECT: "DISCONNECT",
   DISABLED: "DISABLED",
@@ -47,8 +48,20 @@ function updateButton(currentButtonState) {
       connectButton.textContent = "Request Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
+      connectButton.classList.remove("is-link");
+      connectButton.classList.add("is-outlined");
+      connectButton.classList.add("is-info");
+      connectButton.classList.remove("warning");
+      connectButton.classList.remove("is-loading");
+      connectButton.disabled = false;
+      break;
+    case ButtonState.JOIN_SESSION:
+      connectButton.textContent = "Join Session";
+      connectButton.classList.remove("is-success");
+      connectButton.classList.remove("is-danger");
       connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
+      connectButton.classList.remove("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
@@ -59,6 +72,7 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-danger");
       connectButton.classList.remove("is-link");
       connectButton.classList.remove("is-outlined");
+      connectButton.classList.remove("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
@@ -69,6 +83,7 @@ function updateButton(currentButtonState) {
       connectButton.classList.add("is-danger");
       connectButton.classList.remove("is-link");
       connectButton.classList.remove("is-outlined");
+      connectButton.classList.remove("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
@@ -79,6 +94,7 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-danger");
       connectButton.classList.remove("is-link");
       connectButton.classList.remove("is-outlined");
+      connectButton.classList.remove("is-info");
       connectButton.classList.add("warning");
       connectButton.classList.add("is-loading");
       connectButton.disabled = false;
@@ -92,6 +108,7 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-danger");
       connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
+      connectButton.classList.remove("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
