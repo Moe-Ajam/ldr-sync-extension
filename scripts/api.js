@@ -65,31 +65,75 @@ async function createSession() {
   });
 }
 
-async function joinSession() {
-  const token = localStorage.getItem("auth_token");
-  const sessionID = linkKeyTextBox.value;
+async function joinSession(sessionID) {
+  chrome.storage.local.get(["auth_token"], async (result) => {
+    const token = result.auth_token;
 
-  if (!sessionID) {
-    alert("Please enter a session ID to join.");
-    return;
-  }
-
-  try {
-    const response = await fetch(API_URL + "/join-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ session_id: sessionID }),
-    });
-
-    if (response.ok) {
-      connectWebSocket(sessionID);
-    } else {
-      alert("Failed to create a session.");
+    if (!token) {
+      console.error("Authorization token missing");
+      return;
     }
-  } catch (error) {
-    console.error("Error creating session:", error);
-  }
+    try {
+      const response = await fetch(API_URL + "/join-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ session_id: sessionID }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const sessionID = data.session_id;
+
+        chrome.runtime.sendMessage(
+          {
+            type: "connect_websocket",
+            sessionID: sessionID,
+          },
+          (response) => {
+            if (response.status === "connected") {
+              console.log("WebSocket connected through background.js");
+
+              chrome.storage.local.set({
+                connection_status: "connected",
+                session_id: sessionID,
+              });
+            }
+          },
+        );
+      } else {
+        alert("Failed to create a session.");
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+    }
+  });
+  // const token = localStorage.getItem("auth_token");
+  // const sessionID = linkKeyTextBox.value;
+  //
+  // if (!sessionID) {
+  //   alert("Please enter a session ID to join.");
+  //   return;
+  // }
+  //
+  // try {
+  //   const response = await fetch(API_URL + "/join-session", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     body: JSON.stringify({ session_id: sessionID }),
+  //   });
+  //
+  //   if (response.ok) {
+  //     connectWebSocket(sessionID);
+  //   } else {
+  //     alert("Failed to create a session.");
+  //   }
+  // } catch (error) {
+  //   console.error("Error creating session:", error);
+  // }
 }

@@ -18,6 +18,8 @@ const ButtonState = {
   REQUEST_SESSION: "REQUEST_SESSION",
   CONNECT: "CONNECT",
   DISCONNECT: "DISCONNECT",
+  DISABLED: "DISABLED",
+  LOADIND: "LOADING",
 };
 
 showSignUpButton.addEventListener("click", showSignUp);
@@ -47,6 +49,9 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-danger");
       connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
+      connectButton.classList.remove("warning");
+      connectButton.classList.remove("is-loading");
+      connectButton.disabled = false;
       break;
     case ButtonState.CONNECT:
       connectButton.textContent = "Connect";
@@ -54,21 +59,42 @@ function updateButton(currentButtonState) {
       connectButton.classList.remove("is-danger");
       connectButton.classList.remove("is-link");
       connectButton.classList.remove("is-outlined");
+      connectButton.classList.remove("warning");
+      connectButton.classList.remove("is-loading");
+      connectButton.disabled = false;
       break;
     case ButtonState.DISCONNECT:
       connectButton.textContent = "Disconnect";
       connectButton.classList.remove("is-success");
       connectButton.classList.add("is-danger");
       connectButton.classList.remove("is-link");
+      connectButton.classList.remove("is-outlined");
+      connectButton.classList.remove("warning");
+      connectButton.classList.remove("is-loading");
+      connectButton.disabled = false;
+      break;
+    case ButtonState.LOADIND:
+      connectButton.textContent = "Loading";
+      connectButton.classList.remove("is-success");
+      connectButton.classList.remove("is-danger");
       connectButton.classList.remove("is-link");
       connectButton.classList.remove("is-outlined");
+      connectButton.classList.add("warning");
+      connectButton.classList.add("is-loading");
+      connectButton.disabled = false;
+      break;
+    case ButtonState.DISABLED:
+      connectButton.disabled = true;
       break;
     default:
-      connectButton.textContent = "New Session";
+      connectButton.textContent = "Request Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
       connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
+      connectButton.classList.remove("warning");
+      connectButton.classList.remove("is-loading");
+      connectButton.disabled = false;
       break;
   }
 }

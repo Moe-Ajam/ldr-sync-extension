@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const isValid = await validateToken(token);
         if (isValid) {
           console.log("Token is valid");
+          updateButton(ButtonState.REQUEST_SESSION);
           showMainContent();
         } else {
           console.log("Token is invalid");
@@ -39,11 +40,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Connecting button logic
   connectButton.onclick = async () => {
     if (connectButton.textContent === "Request Session") {
-      console.log("Requesting connection...");
       await createSession();
       updateButton(ButtonState.DISCONNECT);
     } else if (connectButton.textContent === "Disconnect") {
-      console.log("Disconnecting session...");
       await disconnectSession();
       updateButton(ButtonState.REQUEST_SESSION);
       linkKeyTextBox.value = "";
