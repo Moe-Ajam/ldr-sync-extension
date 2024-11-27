@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           updateButton(ButtonState.REQUEST_SESSION);
           linkKeyTextBox.value = "";
         } else if (connectButton.textContent === "Join Session") {
-          await joinSession();
+          await joinSession(linkKeyTextBox.value);
           updateButton(ButtonState.DISCONNECT);
         }
       };
