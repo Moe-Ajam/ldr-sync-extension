@@ -53,9 +53,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Connecting button logic
       connectButton.onclick = async () => {
         if (connectButton.textContent === "Request Session") {
+          updateButton(ButtonState.LOADIND);
           await createSession();
           updateButton(ButtonState.DISCONNECT);
         } else if (connectButton.textContent === "Disconnect") {
+          updateButton(ButtonState.LOADIND);
           await disconnectSession();
           updateButton(ButtonState.REQUEST_SESSION);
           linkKeyTextBox.value = "";
