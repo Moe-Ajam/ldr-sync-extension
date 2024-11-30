@@ -66,8 +66,9 @@ async function createSession() {
 }
 
 async function joinSession(sessionID) {
-  chrome.storage.local.get(["auth_token"], async (result) => {
+  chrome.storage.local.get(["auth_token", "username"], async (result) => {
     const token = result.auth_token;
+    const username = result.username;
 
     if (!token) {
       console.error("Authorization token missing");
@@ -80,7 +81,7 @@ async function joinSession(sessionID) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ session_id: sessionID }),
+        body: JSON.stringify({ session_id: sessionID, request_user: username }),
       });
 
       if (response.ok) {
@@ -110,30 +111,4 @@ async function joinSession(sessionID) {
       console.error("Error creating session:", error);
     }
   });
-  // const token = localStorage.getItem("auth_token");
-  // const sessionID = linkKeyTextBox.value;
-  //
-  // if (!sessionID) {
-  //   alert("Please enter a session ID to join.");
-  //   return;
-  // }
-  //
-  // try {
-  //   const response = await fetch(API_URL + "/join-session", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //     body: JSON.stringify({ session_id: sessionID }),
-  //   });
-  //
-  //   if (response.ok) {
-  //     connectWebSocket(sessionID);
-  //   } else {
-  //     alert("Failed to create a session.");
-  //   }
-  // } catch (error) {
-  //   console.error("Error creating session:", error);
-  // }
 }
