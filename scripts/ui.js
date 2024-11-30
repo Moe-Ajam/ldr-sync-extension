@@ -48,9 +48,9 @@ function updateButton(currentButtonState) {
       connectButton.textContent = "Request Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.remove("is-link");
+      connectButton.classList.add("is-link");
       connectButton.classList.add("is-outlined");
-      connectButton.classList.add("is-info");
+      connectButton.classList.remove("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
@@ -59,9 +59,9 @@ function updateButton(currentButtonState) {
       connectButton.textContent = "Join Session";
       connectButton.classList.remove("is-success");
       connectButton.classList.remove("is-danger");
-      connectButton.classList.add("is-link");
-      connectButton.classList.add("is-outlined");
-      connectButton.classList.remove("is-info");
+      connectButton.classList.remove("is-link");
+      connectButton.classList.remove("is-outlined");
+      connectButton.classList.add("is-info");
       connectButton.classList.remove("warning");
       connectButton.classList.remove("is-loading");
       connectButton.disabled = false;
