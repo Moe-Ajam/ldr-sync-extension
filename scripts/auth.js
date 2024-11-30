@@ -12,6 +12,8 @@ document.getElementById("signUpForm").addEventListener("submit", async (e) => {
   });
   if (response.ok) {
     showSignIn();
+  } else if (response.status === 409) {
+    alert("email or username are already in use");
   } else {
     alert("Sign up failed");
   }
