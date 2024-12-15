@@ -1,4 +1,4 @@
-const WS_URL = "ws://127.0.0.1:8080/api";
+const WS_URL = "ws://82.112.255.162:8080/api";
 
 let socket = null;
 let sessionID = null;
