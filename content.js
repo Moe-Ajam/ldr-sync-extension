@@ -38,19 +38,27 @@ async function startMonitoringPlayback() {
     if (message.action === "pause") {
       video.pause();
     }
+    if (message.action === "play") {
+      video.play();
+    }
   });
 
   video.addEventListener("pause", () => {
-    console.log("Video is paused @ time:", video.currentTime);
     chrome.runtime.sendMessage({
       action: "pause",
       current_time: video.currentTime,
     });
   });
 
+  video.addEventListener("play", () => {
+    chrome.runtime.sendMessage({
+      action: "play",
+      current_time: video.currentTime,
+    });
+  });
+
   setInterval(() => {
     const currentTime = video.currentTime;
-    console.log("Current playback time:", currentTime);
     chrome.runtime.sendMessage({
       action: "update_time",
       current_time: currentTime,
