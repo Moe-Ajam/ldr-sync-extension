@@ -67,6 +67,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       socket.readyState === WebSocket.OPEN
     ) {
       sendMessage("pause", message.current_time, result.username);
+    } else if (
+      message.action === "play" &&
+      socket &&
+      socket.readyState === WebSocket.OPEN
+    ) {
+      sendMessage("play", message.current_time, result.username);
     } else if (message.type === "connect_websocket") {
       console.log("message recieved:", message);
       connectWebSocket(message.sessionID);
