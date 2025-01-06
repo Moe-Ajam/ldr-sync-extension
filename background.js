@@ -1,4 +1,5 @@
-const WS_URL = "ws://82.112.255.162:8080/api";
+// const WS_URL = "ws://82.112.255.162:8080/api";
+const WS_URL = "wss://api.moecodes.com/api";
 
 let socket = null;
 let sessionID = null;

@@ -1,5 +1,6 @@
 //TODO: use the new logic with the connection button
-const API_URL = "http://82.112.255.162:8080/api";
+// const API_URL = "http://82.112.255.162:8080/api";
+const API_URL = "https://api.moecodes.com/api";
 
 async function disconnectSession() {
   chrome.runtime.sendMessage(
