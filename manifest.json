@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LDR Sync",
   "description": "Lync your video player on chrome with your SO to enjoy watching stuff together miles away.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "action": {
     "default_popup": "popup/popup.html"
   },

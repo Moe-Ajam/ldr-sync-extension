@@ -1,69 +1,90 @@
-async function waitForVideoElement() {
-  return new Promise((resolve) => {
-    const video = document.querySelector("video");
+let video = null; // Track the current video element
+let playbackInterval = null;
+
+// Initialize video element
+function initializeVideoElement(newVideo) {
+  console.log("Initializing video element:", newVideo);
+
+  // Remove listeners and interval from the old video element
+  if (video) {
+    video.removeEventListener("pause", handlePause);
+    video.removeEventListener("play", handlePlay);
+    clearInterval(playbackInterval);
+  }
+
+  video = newVideo;
+
+  // Attach listeners to the new video element
+  video.addEventListener("pause", handlePause);
+  video.addEventListener("play", handlePlay);
+
+  // Start sending playback updates
+  playbackInterval = setInterval(() => {
     if (video) {
-      resolve(video);
-      return;
+      chrome.runtime.sendMessage({
+        action: "update_time",
+        current_time: video.currentTime,
+      });
     }
-
-    const observer = new MutationObserver((mutations, observerInstance) => {
-      const video = document.querySelector("video");
-      if (video) {
-        observerInstance.disconnect();
-        resolve(video);
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Fallback: Poll every 500ms in case MutationObserver doesn't catch it
-    const fallbackInterval = setInterval(() => {
-      const video = document.querySelector("video");
-      if (video) {
-        clearInterval(fallbackInterval);
-        observer.disconnect();
-        resolve(video);
-      }
-    }, 500);
-  });
-}
-
-async function startMonitoringPlayback() {
-  const video = await waitForVideoElement();
-  console.log("Video element found:", video);
-
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Message recived in content.js:", message);
-
-    if (message.action === "pause") {
-      video.pause();
-    }
-    if (message.action === "play") {
-      video.play();
-    }
-  });
-
-  video.addEventListener("pause", () => {
-    chrome.runtime.sendMessage({
-      action: "pause",
-      current_time: video.currentTime,
-    });
-  });
-
-  video.addEventListener("play", () => {
-    chrome.runtime.sendMessage({
-      action: "play",
-      current_time: video.currentTime,
-    });
-  });
-
-  setInterval(() => {
-    const currentTime = video.currentTime;
-    chrome.runtime.sendMessage({
-      action: "update_time",
-      current_time: currentTime,
-    });
   }, 1000);
 }
 
-startMonitoringPlayback();
+// Handle video events
+function handlePause() {
+  console.log("Video paused at:", video.currentTime);
+  chrome.runtime.sendMessage({
+    action: "pause",
+    current_time: video.currentTime,
+  });
+}
+
+function handlePlay() {
+  console.log("Video playing at:", video.currentTime);
+  chrome.runtime.sendMessage({
+    action: "play",
+    current_time: video.currentTime,
+  });
+}
+
+// Monitor for video element changes
+function monitorForVideoElement() {
+  const observer = new MutationObserver(() => {
+    const newVideo = document.querySelector("video");
+    if (newVideo && newVideo !== video) {
+      initializeVideoElement(newVideo); // Reinitialize if a new video element is found
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  console.log("Message received in content.js:", message);
+
+  if (!video) {
+    console.warn("Video element not ready. Waiting for initialization...");
+    video = await waitForVideoElement();
+  }
+
+  if (message.action === "pause") {
+    console.log("Pausing video...");
+    video.pause();
+  } else if (message.action === "play") {
+    console.log("Playing video...");
+    video.play();
+  }
+});
+
+// Handle URL changes (e.g., navigating to a new episode)
+let currentUrl = location.href;
+setInterval(() => {
+  if (location.href !== currentUrl) {
+    console.log("URL changed. Reinitializing...");
+    currentUrl = location.href;
+    monitorForVideoElement(); // Reinitialize the video monitoring logic
+  }
+}, 1000);
+
+// Start monitoring
+monitorForVideoElement();
