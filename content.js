@@ -1,90 +1,126 @@
-let video = null; // Track the current video element
-let playbackInterval = null;
+var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
-// Initialize video element
-function initializeVideoElement(newVideo) {
-  console.log("Initializing video element:", newVideo);
+var tc = {
+  settings: {
+    enabled: true,
 
-  // Remove listeners and interval from the old video element
-  if (video) {
-    video.removeEventListener("pause", handlePause);
-    video.removeEventListener("play", handlePlay);
-    clearInterval(playbackInterval);
+    blacklist: `\
+    www.crunchyroll.com
+    twitter.com
+    imgur.com
+    teams.microsoft.com
+    `.replace(regStrip, ""),
+    defaultLogLevel: 4,
+    logLevel: 6,
+  },
+
+  mediaElements: [],
+};
+
+log("Script starting...", 5);
+
+function log(message, level) {
+  verbosity = tc.settings.logLevel;
+  if (typeof level === "undefined") {
+    level = tc.settings.defaultLogLevel;
   }
+  if (verbosity >= level) {
+    if (level === 2) {
+      console.log("ERROR:" + message);
+    } else if (level === 3) {
+      console.log("WARNING:" + message);
+    } else if (level === 4) {
+      console.log("INFO:" + message);
+    } else if (level === 5) {
+      console.log("DEBUG:" + message);
+    } else if (level === 6) {
+      console.log("DEBUG (VERBOSE):" + message);
+      // outputs a static trace to the console, can also output the sequence of events that led to this point
+      console.trace();
+    }
+  }
+}
 
-  video = newVideo;
-
-  // Attach listeners to the new video element
-  video.addEventListener("pause", handlePause);
-  video.addEventListener("play", handlePlay);
-
-  // Start sending playback updates
-  playbackInterval = setInterval(() => {
-    if (video) {
-      chrome.runtime.sendMessage({
-        action: "update_time",
-        current_time: video.currentTime,
+var documentAndShadowRootObserver = new MutationObserver(function (mutations) {
+  // Process the DOM nodes lazily without affecting the page critical events
+  requestIdleCallback(
+    (_) => {
+      mutations.forEach(function (mutation) {
+        switch (mutation.type) {
+          case "childList":
+            mutation.addedNodes.forEach(function (node) {
+              if (typeof node === "function") return;
+              if (node === document.documentElement) {
+                log("Document was replaced, reinitializing", 5);
+                // initializeWhenReady(document);
+                return;
+              }
+              checkForVideo(node, node.parentNode || mutation.target, true);
+            });
+            mutation.removedNodes.forEach(function (node) {
+              if (typeof node === "function") return;
+              // checkForVideoAndShadowRoot(
+              //   node,
+              //   node.parentNode || mutation.target,
+              //   false,
+              // );
+            });
+            break;
+        }
       });
-    }
-  }, 1000);
-}
-
-// Handle video events
-function handlePause() {
-  console.log("Video paused at:", video.currentTime);
-  chrome.runtime.sendMessage({
-    action: "pause",
-    current_time: video.currentTime,
-  });
-}
-
-function handlePlay() {
-  console.log("Video playing at:", video.currentTime);
-  chrome.runtime.sendMessage({
-    action: "play",
-    current_time: video.currentTime,
-  });
-}
-
-// Monitor for video element changes
-function monitorForVideoElement() {
-  const observer = new MutationObserver(() => {
-    const newVideo = document.querySelector("video");
-    if (newVideo && newVideo !== video) {
-      initializeVideoElement(newVideo); // Reinitialize if a new video element is found
-    }
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// Listen for messages from the background script
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  console.log("Message received in content.js:", message);
-
-  if (!video) {
-    console.warn("Video element not ready. Waiting for initialization...");
-    video = await waitForVideoElement();
-  }
-
-  if (message.action === "pause") {
-    console.log("Pausing video...");
-    video.pause();
-  } else if (message.action === "play") {
-    console.log("Playing video...");
-    video.play();
-  }
+    },
+    { timeout: 1000 },
+  );
 });
 
-// Handle URL changes (e.g., navigating to a new episode)
-let currentUrl = location.href;
-setInterval(() => {
-  if (location.href !== currentUrl) {
-    console.log("URL changed. Reinitializing...");
-    currentUrl = location.href;
-    monitorForVideoElement(); // Reinitialize the video monitoring logic
-  }
-}, 1000);
+var documentAndShadowRootObserverOptions = {
+  attributeFilter: ["aria-hidden", "data-focus-method"],
+  childList: true,
+  subtree: true,
+};
 
-// Start monitoring
-monitorForVideoElement();
+documentAndShadowRootObserver.observe(
+  document,
+  documentAndShadowRootObserverOptions,
+);
+
+function checkForVideo(node, parent, added) {
+  if (!added && document.body?.contains(node)) {
+    return;
+  }
+  if (node.nodeName === "VIDEO") {
+    if (added) {
+      log("Video element added", 5);
+    }
+  } else {
+    var children = [];
+    if (node.children) {
+      children = [...children, ...node.children];
+    }
+    for (const child of children) {
+      checkForVideo(child, child.parentNode || parent, added);
+    }
+  }
+}
+
+function initializeWhenReady(document) {
+  log("Begin initializeWhenReady", 5);
+  window.onload = () => {
+    initializeNow(window.document);
+  };
+  if (document) {
+    if (document.readyState === "complete") {
+      log("Running initializeNow...", 5);
+      initialieNow(document);
+    } else {
+      document.onreadystatechange = () => {
+        if (document.readyState === "complete") {
+          log("Running initializeNow frome else...", 5);
+          initializeNow(document);
+        }
+      };
+    }
+  }
+
+  log("End initializeWhenReady", 5);
+}
