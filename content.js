@@ -57,14 +57,6 @@ var documentAndShadowRootObserver = new MutationObserver(function (mutations) {
               }
               checkForVideo(node, node.parentNode || mutation.target, true);
             });
-            mutation.removedNodes.forEach(function (node) {
-              if (typeof node === "function") return;
-              // checkForVideoAndShadowRoot(
-              //   node,
-              //   node.parentNode || mutation.target,
-              //   false,
-              // );
-            });
             break;
         }
       });
@@ -91,6 +83,13 @@ function checkForVideo(node, parent, added) {
   if (node.nodeName === "VIDEO") {
     if (added) {
       log("Video element added", 5);
+      //TODO: Fix the isVideoReady function to return correctly and consider a better flow to handle this situation
+      const videoReadySatate = isVideoReady();
+      if (videoReadySatate) {
+        const videoPlayer =
+          window.netflix.appContext.state.playerApp.getAPI().videoPlayer;
+        console.log(videoPlayer);
+      }
     }
   } else {
     var children = [];
@@ -103,20 +102,40 @@ function checkForVideo(node, parent, added) {
   }
 }
 
-function initializeWhenReady(document) {
+// TODO: this is not working as expected, its not capturing hte netflix video element
+function isVideoReady(document) {
   log("Begin initializeWhenReady", 5);
-  window.onload = () => {
-    initializeNow(window.document);
-  };
-  if (document) {
+  // window.onload = () => {
+  //   return true;
+  // };
+  if (document && location.hostname != "www.netflix.com") {
     if (document.readyState === "complete") {
       log("Running initializeNow...", 5);
-      initialieNow(document);
+      return true;
     } else {
       document.onreadystatechange = () => {
         if (document.readyState === "complete") {
-          log("Running initializeNow frome else...", 5);
-          initializeNow(document);
+          log("Running initializeNow from else...", 5);
+          return true;
+        }
+      };
+    }
+  } else if (document && location.hostname === "www.netflix.com") {
+    log("You are on netflix");
+    if (
+      document.readyState === "complete" &&
+      window.netflix &&
+      window.netflix.appContext &&
+      window.netflix.appContext.state &&
+      window.netflix.appContext.state.playerApp &&
+      typeof window.netflix.appContext.state.playerApp.getAPI === "function"
+    ) {
+      return true;
+    } else {
+      document.onreadystatechange = () => {
+        if (document.readyState === "complete") {
+          log("Running initializeNow from netflix else...", 5);
+          return true;
         }
       };
     }
