@@ -76,23 +76,23 @@ documentAndShadowRootObserver.observe(
   documentAndShadowRootObserverOptions,
 );
 
+const processedVideo = new WeakSet();
+
 function checkForVideo(node, parent, added) {
   if (!added && document.body?.contains(node)) {
     return;
   }
   if (node.nodeName === "VIDEO") {
-    if (added) {
+    if (added && !processedVideo.has(node)) {
       log("Video element added", 5);
-      //TODO: Fix the isVideoReady function to return correctly and consider a better flow to handle this situation
-      const videoReadySatate = isVideoReady();
-      if (videoReadySatate) {
-        const videoPlayer =
-          window.netflix.appContext.state.playerApp.getAPI().videoPlayer;
-        console.log(videoPlayer);
-      }
+      processedVideo.add(node);
+      console.log(node);
     }
   } else {
     var children = [];
+    if (node.shadowRoot) {
+      children = [...children, ...node.shadowRoot.children];
+    }
     if (node.children) {
       children = [...children, ...node.children];
     }
@@ -102,44 +102,6 @@ function checkForVideo(node, parent, added) {
   }
 }
 
-// TODO: this is not working as expected, its not capturing hte netflix video element
-function isVideoReady(document) {
-  log("Begin initializeWhenReady", 5);
-  // window.onload = () => {
-  //   return true;
-  // };
-  if (document && location.hostname != "www.netflix.com") {
-    if (document.readyState === "complete") {
-      log("Running initializeNow...", 5);
-      return true;
-    } else {
-      document.onreadystatechange = () => {
-        if (document.readyState === "complete") {
-          log("Running initializeNow from else...", 5);
-          return true;
-        }
-      };
-    }
-  } else if (document && location.hostname === "www.netflix.com") {
-    log("You are on netflix");
-    if (
-      document.readyState === "complete" &&
-      window.netflix &&
-      window.netflix.appContext &&
-      window.netflix.appContext.state &&
-      window.netflix.appContext.state.playerApp &&
-      typeof window.netflix.appContext.state.playerApp.getAPI === "function"
-    ) {
-      return true;
-    } else {
-      document.onreadystatechange = () => {
-        if (document.readyState === "complete") {
-          log("Running initializeNow from netflix else...", 5);
-          return true;
-        }
-      };
-    }
-  }
-
-  log("End initializeWhenReady", 5);
+function initializeNow() {
+  log("Begin initializeNow", 5);
 }
