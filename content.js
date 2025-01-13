@@ -52,7 +52,6 @@ var documentAndShadowRootObserver = new MutationObserver(function (mutations) {
               if (typeof node === "function") return;
               if (node === document.documentElement) {
                 log("Document was replaced, reinitializing", 5);
-                // initializeWhenReady(document);
                 return;
               }
               checkForVideo(node, node.parentNode || mutation.target, true);
@@ -76,6 +75,10 @@ documentAndShadowRootObserver.observe(
   documentAndShadowRootObserverOptions,
 );
 
+// document.querySelectorAll("*").forEach((element) => {
+//   console.log(element);
+// });
+
 const processedVideo = new WeakSet();
 
 function checkForVideo(node, parent, added) {
@@ -86,12 +89,15 @@ function checkForVideo(node, parent, added) {
     if (added && !processedVideo.has(node)) {
       log("Video element added", 5);
       processedVideo.add(node);
-      console.log(node);
     }
   } else {
     var children = [];
     if (node.shadowRoot) {
-      children = [...children, ...node.shadowRoot.children];
+      documentAndShadowRootObserver.observe(
+        node.shadowRoot,
+        documentAndShadowRootObserverOptions,
+      );
+      children = Array.from(node.shadowRoot.children);
     }
     if (node.children) {
       children = [...children, ...node.children];
