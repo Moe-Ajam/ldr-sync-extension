@@ -1,4 +1,6 @@
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+let video = null;
+let playbackInterval = null;
 
 var tc = {
   settings: {
@@ -11,7 +13,7 @@ var tc = {
     teams.microsoft.com
     `.replace(regStrip, ""),
     defaultLogLevel: 4,
-    logLevel: 6,
+    logLevel: 2,
   },
 
   mediaElements: [],
@@ -40,6 +42,77 @@ function log(message, level) {
     }
   }
 }
+
+function initializeVideoElement(newVideo) {
+  log("Initializing video element", 5);
+
+  // Remove listeners and interval from the old video element
+  if (video) {
+    video.removeEventListener("pause", handlePause);
+    video.removeEventListener("play", handlePlay);
+    clearInterval(playbackInterval);
+  }
+
+  video = newVideo;
+
+  // Attach listeners to the new video element
+  video.addEventListener("pause", handlePause);
+  video.addEventListener("play", handlePlay);
+
+  // Start sending playback updates
+  playbackInterval = setInterval(() => {
+    if (video) {
+      safeSendMessage({
+        action: "update_time",
+        current_time: video.currentTime,
+      });
+    }
+  }, 3000);
+}
+
+// Handle video events
+function handlePause() {
+  log("Video paused at:" + video.currentTime, 5);
+  safeSendMessage({
+    action: "pause",
+    current_time: video.currentTime,
+  });
+}
+
+function handlePlay() {
+  log("Video playing at:" + video.currentTime, 5);
+  safeSendMessage({
+    action: "play",
+    current_time: video.currentTime,
+  });
+}
+
+function safeSendMessage(message) {
+  try {
+    chrome.runtime.sendMessage(message);
+  } catch (error) {
+    if (error.message.includes("Extension context invalidated")) {
+      log("Extension context invalidated. Message not sent.", 3);
+    } else {
+      log("Error sending message: " + error.message, 2);
+    }
+  }
+}
+
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener(
+  async (message, _sender, _sendResponse) => {
+    log("Message received in content.js:" + message, 5);
+
+    if (message.action === "pause") {
+      log("Pausing video...", 5);
+      video.pause();
+    } else if (message.action === "play") {
+      log("Playing video...", 5);
+      video.play();
+    }
+  },
+);
 
 var documentAndShadowRootObserver = new MutationObserver(function (mutations) {
   // Process the DOM nodes lazily without affecting the page critical events
@@ -75,20 +148,14 @@ documentAndShadowRootObserver.observe(
   documentAndShadowRootObserverOptions,
 );
 
-// document.querySelectorAll("*").forEach((element) => {
-//   console.log(element);
-// });
-
-const processedVideo = new WeakSet();
-
 function checkForVideo(node, parent, added) {
   if (!added && document.body?.contains(node)) {
     return;
   }
   if (node.nodeName === "VIDEO") {
-    if (added && !processedVideo.has(node)) {
+    if (added) {
       log("Video element added", 5);
-      processedVideo.add(node);
+      initializeVideoElement(node);
     }
   } else {
     var children = [];
